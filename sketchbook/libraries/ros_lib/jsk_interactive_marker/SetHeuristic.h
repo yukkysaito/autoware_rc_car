@@ -1,0 +1,86 @@
+#ifndef _ROS_SERVICE_SetHeuristic_h
+#define _ROS_SERVICE_SetHeuristic_h
+#include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
+#include "ros/msg.h"
+
+namespace jsk_interactive_marker
+{
+
+static const char SETHEURISTIC[] = "jsk_interactive_marker/SetHeuristic";
+
+  class SetHeuristicRequest : public ros::Msg
+  {
+    public:
+      const char* heuristic;
+
+    SetHeuristicRequest():
+      heuristic("")
+    {
+    }
+
+    virtual int serialize(unsigned char *outbuffer) const
+    {
+      int offset = 0;
+      uint32_t length_heuristic = strlen(this->heuristic);
+      memcpy(outbuffer + offset, &length_heuristic, sizeof(uint32_t));
+      offset += 4;
+      memcpy(outbuffer + offset, this->heuristic, length_heuristic);
+      offset += length_heuristic;
+      return offset;
+    }
+
+    virtual int deserialize(unsigned char *inbuffer)
+    {
+      int offset = 0;
+      uint32_t length_heuristic;
+      memcpy(&length_heuristic, (inbuffer + offset), sizeof(uint32_t));
+      offset += 4;
+      for(unsigned int k= offset; k< offset+length_heuristic; ++k){
+          inbuffer[k-1]=inbuffer[k];
+      }
+      inbuffer[offset+length_heuristic-1]=0;
+      this->heuristic = (char *)(inbuffer + offset-1);
+      offset += length_heuristic;
+     return offset;
+    }
+
+    const char * getType(){ return SETHEURISTIC; };
+    const char * getMD5(){ return "96bf1327fac533122d937324246cbde4"; };
+
+  };
+
+  class SetHeuristicResponse : public ros::Msg
+  {
+    public:
+
+    SetHeuristicResponse()
+    {
+    }
+
+    virtual int serialize(unsigned char *outbuffer) const
+    {
+      int offset = 0;
+      return offset;
+    }
+
+    virtual int deserialize(unsigned char *inbuffer)
+    {
+      int offset = 0;
+     return offset;
+    }
+
+    const char * getType(){ return SETHEURISTIC; };
+    const char * getMD5(){ return "d41d8cd98f00b204e9800998ecf8427e"; };
+
+  };
+
+  class SetHeuristic {
+    public:
+    typedef SetHeuristicRequest Request;
+    typedef SetHeuristicResponse Response;
+  };
+
+}
+#endif
