@@ -8,3 +8,4 @@ memo
 7. structure sensor
 8. zed setup on tx1
 9. network setup
+10.BLDC(VESC) setup

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015, Nagoya University
+ *  Copyright (c) 2017, Yukihiro Saito
  *  All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without
@@ -34,8 +34,8 @@
 
 #include <boost/thread.hpp>
 #include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/Twist.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <ackermann_msgs/AckermannDriveStamped.h>
 #include <ros/ros.h>
 
 using namespace std;
@@ -55,14 +55,14 @@ private:
 
 public:
   TwistCmdConverter()
-      : nh_("~"), queue_size_(100), twist_in_("/twist_in"),
+      : nh_("~"), queue_size_(1), twist_in_("/twist_in"),
         twist_out_("/twist_out") {
     // Subscribe to the cloud topic using both the old message format and the
     // new
     sub_twist_ = nh_.subscribe(twist_in_, queue_size_,
-                               &TwistCmdConverter::cloud_cb_twist, this);
+                               &TwistCmdConverter::twistCallback, this);
 
-    pub_twist_ = nh_.advertise<geometry_msgs::Twist>(twist_out_, queue_size_);
+    pub_twist_ = nh_.advertise<ackermann_msgs::AckermannDriveStamped>(twist_out_, queue_size_);
     nh_.resolveName(twist_in_).c_str();
     nh_.resolveName(twist_out_).c_str();
     w_linear_x_ = 1.0;
@@ -71,23 +71,22 @@ public:
     nh_.getParam("weight_angular_z", w_angular_z_);
   }
 
-  void cloud_cb_twist(const geometry_msgs::TwistStampedConstPtr &msg) {
+  void twistCallback(const geometry_msgs::TwistStampedConstPtr &msg) {
     if (pub_twist_.getNumSubscribers() <= 0) {
-      // ROS_DEBUG ("[point_cloud_converter] Got a PointCloud with %d points on
-      // %s, but no subscribers.", (int)msg->points.size (), nh_.resolveName
-      // (points_in_).c_str ());
       return;
     }
 
-    geometry_msgs::Twist output;
-    output = msg->twist;
-    output.linear.x = output.linear.x * w_linear_x_;
-    output.angular.z = output.angular.z * w_angular_z_;
+    ackermann_msgs::AckermannDriveStamped output;
+    output.header = msg->header;
+
+    output.drive.speed = msg->twist.linear.x * w_linear_x_;
+    output.drive.steering_angle = msg->twist.angular.z * w_angular_z_;
+
     pub_twist_.publish(output);
   }
 };
 
-/* ---[ */
+/* -- twist converter main -- */
 int main(int argc, char **argv) {
   // ROS init
   ros::init(argc, argv, "twist_cmd_converter",

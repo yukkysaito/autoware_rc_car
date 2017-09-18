@@ -41,7 +41,7 @@ roscd razor_imu_9dof/config
 cp razor.yaml my_razor.yaml
 #in my_razor.yaml
 # port: /dev/ttyUSB0 -> port: /dev/IMU
-sudo apt-get install ros-kinetic-rviz-imu-plugin 
+sudo apt-get install ros-kinetic-rviz-imu-plugin
 
 #intel realsense r200
 #http://wiki.ros.org/action/fullsearch/RealSense
@@ -51,3 +51,13 @@ bash ./enable_kernel_sources.sh
 # structure sensor-ros install
 sudo apt-get install -y g++ python libusb-1.0-0-dev freeglut3-dev doxygen graphviz default-jdk
 sudo apt-get install ros-kinetic-openni2_camera ros-kinetic-openni2_launch
+
+# vsec install
+echo "Installing VSEC"
+sudo apt-get install qtcreator qt-sdk libudev-dev libqt5serialport5-dev
+git clone https://github.com/vedderb/bldc-tool
+cd bldc-tool
+qmake -qt=qt5
+make clean && make
+
+sudo apt-get install ros-kinetic-ackermann-msgs ros-kinetic-serial

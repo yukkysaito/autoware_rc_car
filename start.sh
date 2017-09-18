@@ -1,5 +1,6 @@
 #! /bin/bash
 cd ~/Autoware/ros/
+source ./devel/setup.sh
 ./run
 
 sleep 3

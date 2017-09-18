@@ -7,6 +7,7 @@ project(twist_cmd_converter)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   geometry_msgs
+  ackermann_msgs
 )
 
 
